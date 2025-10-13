@@ -454,6 +454,7 @@ body {
     gap: 2.5rem;
 }
 
+
 .nav-link {
     text-decoration: none;
     color: var(--light-text-secondary);
@@ -610,6 +611,11 @@ section:target~.navbar .nav-link[href="#home"]::after,
     flex-wrap: wrap;
 }
 
+.btn-container a {
+    text-decoration: none;
+    color: white;
+}
+
 .btn {
     padding: 1rem 2rem;
     border-radius: var(--border-radius);
@@ -677,6 +683,17 @@ section:target~.navbar .nav-link[href="#home"]::after,
     z-index: 2;
     border: 1px solid rgba(255, 255, 255, 0.1);
     box-shadow: var(--box-shadow);
+    transition: all 0.3s ease;
+}
+
+.profile-img:hover {
+    border: 2px solid var(--color-primary);
+    box-shadow:
+        0 0 20px rgba(221, 202, 125, 0.6),
+        0 0 30px rgba(221, 202, 125, 0.4),
+        0 0 40px rgba(221, 202, 125, 0.2);
+    transform: scale(1.05);
+
 }
 
 .floating-shapes {
@@ -758,6 +775,7 @@ section:target~.navbar .nav-link[href="#home"]::after,
     background: rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.1);
+    text-decoration: none;
 }
 
 .social-link:hover {
