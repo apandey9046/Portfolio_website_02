@@ -31,12 +31,12 @@
 [data-theme="light"] {
     --dark-bg: #ffffff;
     --dark-card: #f8f9fa;
-    --light-text: black;
-    --light-text-secondary: black;
+    --light-text: #1a1a1a;
+    --light-text-secondary: #4a5568;
     --border-color: rgba(0, 0, 0, 0.1);
     --shadow-color: rgba(0, 0, 0, 0.1);
     --icon-color: #2d3748;
-    --gradient-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --gradient-bg: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e0 100%);
 }
 
 /* ========== BASE STYLES & RESET ========== */
@@ -858,7 +858,6 @@ section:target~.navbar .nav-link[href="#home"]::after,
     color: transparent;
     opacity: 0;
     animation: fadeInUp 0.8s ease forwards;
-    color: white;
 }
 
 .title-line:nth-child(1) {
@@ -1032,7 +1031,7 @@ section:target~.navbar .nav-link[href="#home"]::after,
 .home-social-icons {
     position: fixed;
     right: 2rem;
-    top: 60%;
+    top: 15rem;
     transform: translateY(-80%);
     display: flex;
     flex-direction: column;
@@ -1445,6 +1444,8 @@ section:target~.navbar .nav-link[href="#home"]::after,
     color: var(--icon-color);
 }
 
+
+
 [data-theme="light"] .project-link .fas,
 [data-theme="light"] .project-link .fab {
     color: var(--light-text);
@@ -1484,7 +1485,6 @@ section:target~.navbar .nav-link[href="#home"]::after,
 
     .home-social-icons {
         display: none;
-        /* Hide social icons on tablet and mobile */
     }
 
     .about-content {
