@@ -12,16 +12,9 @@ function initTheme() {
         const currentTheme = document.documentElement.getAttribute('data-theme');
         const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
 
-        // Add theme transition animation
-        document.documentElement.style.transition = 'all 0.5s ease';
         document.documentElement.setAttribute('data-theme', newTheme);
         localStorage.setItem('theme', newTheme);
         updateThemeButton(newTheme);
-
-        // Remove transition after animation
-        setTimeout(() => {
-            document.documentElement.style.transition = '';
-        }, 500);
     });
 
     function updateThemeButton(theme) {
@@ -31,45 +24,11 @@ function initTheme() {
         if (theme === 'light') {
             themeIcon.className = 'fas fa-sun';
             themeText.textContent = 'Light';
-            themeIcon.style.animation = 'sunRotate 0.5s ease';
         } else {
             themeIcon.className = 'fas fa-moon';
             themeText.textContent = 'Dark';
-            themeIcon.style.animation = 'moonRotate 0.5s ease';
         }
-
-        // Remove animation after it completes
-        setTimeout(() => {
-            themeIcon.style.animation = '';
-        }, 500);
     }
-
-    // Add CSS for theme toggle animations
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes sunRotate {
-            from {
-                transform: rotate(0deg) scale(0.8);
-                opacity: 0.5;
-            }
-            to {
-                transform: rotate(360deg) scale(1);
-                opacity: 1;
-            }
-        }
-        
-        @keyframes moonRotate {
-            from {
-                transform: rotate(0deg) scale(0.8);
-                opacity: 0.5;
-            }
-            to {
-                transform: rotate(-360deg) scale(1);
-                opacity: 1;
-            }
-        }
-    `;
-    document.head.appendChild(style);
 }
 
 // ========== MOBILE NAVIGATION TOGGLE ==========
@@ -95,145 +54,28 @@ function initMobileMenu() {
             document.body.style.overflow = '';
         });
     });
-
-    // Close mobile menu when clicking outside
-    document.addEventListener('click', (e) => {
-        if (navMenu.classList.contains('active') &&
-            !navMenu.contains(e.target) &&
-            !hamburger.contains(e.target)) {
-            hamburger.classList.remove('active');
-            navMenu.classList.remove('active');
-            document.body.style.overflow = '';
-        }
-    });
 }
 
-// ========== ENHANCED CONTACT FORM HANDLING ==========
+// ========== CONTACT FORM HANDLING ==========
 function initContactForm() {
     const contactForm = document.getElementById('contactForm');
     if (!contactForm) return;
-
-    const formInputs = contactForm.querySelectorAll('.form-input, .form-textarea');
-    const submitBtn = contactForm.querySelector('.form-btn');
-
-    // Real-time validation
-    formInputs.forEach(input => {
-        input.addEventListener('blur', validateField);
-        input.addEventListener('input', clearFieldError);
-    });
 
     // Form submission
     contactForm.addEventListener('submit', function (e) {
         e.preventDefault();
 
-        if (validateForm()) {
-            simulateFormSubmission();
-        }
+        // Show success message
+        showNotification('Thank you for your message! I will get back to you soon.', 'success');
+        contactForm.reset();
     });
-
-    function validateField(e) {
-        const field = e.target;
-        const value = field.value.trim();
-        const fieldName = field.id;
-        const feedback = field.parentElement.querySelector('.form-feedback');
-
-        feedback.textContent = '';
-        feedback.classList.remove('show');
-
-        if (field.hasAttribute('required') && !value) {
-            showFieldError(field, feedback, `${fieldName} is required`);
-            return false;
-        }
-
-        if (fieldName === 'email' && value) {
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(value)) {
-                showFieldError(field, feedback, 'Please enter a valid email address');
-                return false;
-            }
-        }
-
-        if (fieldName === 'name' && value && value.length < 2) {
-            showFieldError(field, feedback, 'Name must be at least 2 characters long');
-            return false;
-        }
-
-        if (fieldName === 'message' && value && value.length < 10) {
-            showFieldError(field, feedback, 'Message must be at least 10 characters long');
-            return false;
-        }
-
-        field.style.borderColor = '';
-        return true;
-    }
-
-    function showFieldError(field, feedback, message) {
-        feedback.textContent = message;
-        feedback.classList.add('show');
-        field.style.borderColor = 'var(--accent-color)';
-        field.focus();
-    }
-
-    function clearFieldError(e) {
-        const field = e.target;
-        const feedback = field.parentElement.querySelector('.form-feedback');
-
-        feedback.textContent = '';
-        feedback.classList.remove('show');
-        field.style.borderColor = '';
-    }
-
-    function validateForm() {
-        let isValid = true;
-
-        formInputs.forEach(input => {
-            if (input.hasAttribute('required')) {
-                const event = new Event('blur');
-                input.dispatchEvent(event);
-                if (input.parentElement.querySelector('.form-feedback.show')) {
-                    isValid = false;
-                }
-            }
-        });
-
-        return isValid;
-    }
-
-    function simulateFormSubmission() {
-        const btnText = submitBtn.querySelector('.btn-text');
-        const btnLoading = submitBtn.querySelector('.btn-loading');
-
-        // Show loading state
-        submitBtn.classList.add('loading');
-        submitBtn.disabled = true;
-
-        // Simulate API call
-        setTimeout(() => {
-            // Show success state
-            submitBtn.classList.remove('loading');
-            submitBtn.classList.add('success');
-            btnText.textContent = 'Message Sent!';
-
-            // Reset form
-            setTimeout(() => {
-                contactForm.reset();
-                submitBtn.classList.remove('success');
-                submitBtn.disabled = false;
-                btnText.textContent = 'Send Message';
-
-                // Show success message
-                showNotification('Thank you for your message! I will get back to you soon.', 'success');
-            }, 2000);
-        }, 2000);
-    }
 }
 
-// ========== ENHANCED CERTIFICATE VERIFICATION SYSTEM ==========
+// ========== SIMPLE CERTIFICATE VERIFICATION SYSTEM ==========
 function initCertificateModal() {
     const certificateModal = document.getElementById('certificateModal');
     const modalClose = document.getElementById('modalClose');
     const closeModalBtn = document.getElementById('closeModalBtn');
-    const downloadBtn = document.querySelector('.download-btn');
 
     // Certificate data with verification links
     const certificateData = {
@@ -246,8 +88,6 @@ function initCertificateModal() {
             description: 'Has successfully completed the Full Stack Web Development course, demonstrating proficiency in modern web technologies including HTML, CSS, JavaScript, Node.js, Express, and MongoDB.',
             skills: ['HTML5', 'CSS3', 'JavaScript ES6+', 'Node.js', 'Express.js', 'MongoDB', 'REST APIs', 'Git'],
             certificateId: 'FSWD20230615',
-            achievement: 'Distinction',
-            seal: '🏆',
             // TODO: ADD YOUR UDEMY CERTIFICATE VERIFICATION LINK HERE
             verificationLink: 'https://www.udemy.com/certificate/your-certificate-id-here/'
         },
@@ -260,8 +100,6 @@ function initCertificateModal() {
             description: 'Has demonstrated advanced proficiency in React development, including hooks, state management, component architecture, and modern React patterns for building scalable applications.',
             skills: ['React', 'Redux', 'React Hooks', 'Context API', 'Component Testing', 'Performance Optimization'],
             certificateId: 'RCT20230322',
-            achievement: 'Excellence',
-            seal: '⭐',
             // TODO: ADD YOUR META CERTIFICATE VERIFICATION LINK HERE
             verificationLink: 'https://coursera.org/verify/your-certificate-id-here'
         },
@@ -274,8 +112,6 @@ function initCertificateModal() {
             description: 'Has mastered JavaScript algorithms and data structures, demonstrating exceptional problem-solving skills and technical interview readiness through comprehensive coding challenges.',
             skills: ['Algorithms', 'Data Structures', 'ES6+', 'Problem Solving', 'Big O Notation', 'Recursion'],
             certificateId: 'JSALG20230110',
-            achievement: 'Mastery',
-            seal: '💎',
             // TODO: ADD YOUR FREECODECAMP CERTIFICATE VERIFICATION LINK HERE
             verificationLink: 'https://freecodecamp.org/certification/your-username/javascript-algorithms-and-data-structures'
         },
@@ -288,8 +124,6 @@ function initCertificateModal() {
             description: 'Has completed the UI/UX Design Specialization, demonstrating expertise in user-centered design principles, wireframing, prototyping, and usability testing methodologies.',
             skills: ['Figma', 'User Research', 'Wireframing', 'Prototyping', 'Usability Testing', 'Design Systems'],
             certificateId: 'UIUX20221130',
-            achievement: 'Innovation',
-            seal: '🎨',
             // TODO: ADD YOUR GOOGLE CERTIFICATE VERIFICATION LINK HERE
             verificationLink: 'https://coursera.org/verify/your-specialization-id-here'
         }
@@ -317,8 +151,9 @@ function initCertificateModal() {
             // Update modal content with certificate details
             updateModalContent(certificate);
 
-            // Show the certificate modal with animation
-            showCertificateModal();
+            // Show the certificate modal
+            certificateModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
         });
     });
 
@@ -339,27 +174,7 @@ function initCertificateModal() {
         localStorage.setItem('pendingVerification', JSON.stringify(verificationData));
 
         // Open verification link in new tab
-        const verificationWindow = window.open(certificate.verificationLink, '_blank');
-
-        if (verificationWindow) {
-            // Show waiting notification
-            showNotification(`Redirecting to ${certificate.issuer} for verification...`, 'info');
-
-            // Check for user return every 2 seconds
-            const returnCheck = setInterval(() => {
-                if (verificationWindow.closed) {
-                    clearInterval(returnCheck);
-                    handleUserReturnFromVerification();
-                }
-            }, 2000);
-
-            // Auto-stop checking after 5 minutes
-            setTimeout(() => {
-                clearInterval(returnCheck);
-            }, 300000);
-        } else {
-            showNotification('Please allow pop-ups for verification.', 'warning');
-        }
+        window.open(certificate.verificationLink, '_blank');
     }
 
     // Function to handle user return from verification
@@ -368,12 +183,6 @@ function initCertificateModal() {
 
         if (pendingVerification) {
             const verificationData = JSON.parse(pendingVerification);
-
-            // Show success notification
-            showNotification(
-                `✅ ${verificationData.certificateName} verification completed! Certificate authenticity confirmed by ${verificationData.issuer}.`,
-                'success'
-            );
 
             // Update verify button in modal if it's the same certificate
             if (currentCertificate && currentCertificate.title === verificationData.certificateName) {
@@ -406,15 +215,6 @@ function initCertificateModal() {
                 verifyBtn.style.background = 'var(--gradient-success)';
                 verifyBtn.style.borderColor = 'var(--success-color)';
                 verifyBtn.disabled = true;
-                verifyBtn.classList.remove('secondary-btn');
-                verifyBtn.classList.add('success-btn');
-            } else {
-                verifyBtn.innerHTML = '<i class="fas fa-shield-alt"></i> Verify Certificate';
-                verifyBtn.style.background = '';
-                verifyBtn.style.borderColor = '';
-                verifyBtn.disabled = false;
-                verifyBtn.classList.remove('success-btn');
-                verifyBtn.classList.add('secondary-btn');
             }
         }
     }
@@ -426,18 +226,11 @@ function initCertificateModal() {
             const cardTitle = card.querySelector('.certificate-name').textContent;
             if (cardTitle === certificateName) {
                 const verifyBtn = card.querySelector('.verify-btn');
-                if (verifyBtn) {
-                    if (isVerified) {
-                        verifyBtn.innerHTML = '<i class="fas fa-check-circle"></i> Verified';
-                        verifyBtn.style.background = 'var(--gradient-success)';
-                        verifyBtn.style.borderColor = 'var(--success-color)';
-                        verifyBtn.disabled = true;
-                    } else {
-                        verifyBtn.innerHTML = '<i class="fas fa-shield-alt"></i> Verify';
-                        verifyBtn.style.background = '';
-                        verifyBtn.style.borderColor = '';
-                        verifyBtn.disabled = false;
-                    }
+                if (verifyBtn && isVerified) {
+                    verifyBtn.innerHTML = '<i class="fas fa-check-circle"></i> Verified';
+                    verifyBtn.style.background = 'var(--gradient-success)';
+                    verifyBtn.style.borderColor = 'var(--success-color)';
+                    verifyBtn.disabled = true;
                 }
             }
         });
@@ -475,17 +268,10 @@ function initCertificateModal() {
                 // Check if already verified
                 const verifiedCertificates = JSON.parse(localStorage.getItem('verifiedCertificates') || '{}');
                 if (verifiedCertificates[certificateName]?.verified) {
-                    showNotification(`✅ ${certificateName} is already verified!`, 'success');
                     return;
                 }
 
-                // Add verification animation
-                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Redirecting...';
-                this.disabled = true;
-
-                setTimeout(() => {
-                    handleCertificateVerification(certificate);
-                }, 1000);
+                handleCertificateVerification(certificate);
             }
         });
     });
@@ -499,22 +285,16 @@ function initCertificateModal() {
                     // Check if already verified
                     const verifiedCertificates = JSON.parse(localStorage.getItem('verifiedCertificates') || '{}');
                     if (verifiedCertificates[currentCertificate.title]?.verified) {
-                        showNotification(`✅ ${currentCertificate.title} is already verified!`, 'success');
                         return;
                     }
 
-                    this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Redirecting...';
-                    this.disabled = true;
-
-                    setTimeout(() => {
-                        handleCertificateVerification(currentCertificate);
-                    }, 1000);
+                    handleCertificateVerification(currentCertificate);
                 }
             });
         }
     }
 
-    // Update modal content to include verification button
+    // Update modal content
     function updateModalContent(certificate) {
         document.getElementById('modalCertificateTitle').textContent = certificate.title;
         document.getElementById('certificateTitle').textContent = certificate.title;
@@ -525,12 +305,6 @@ function initCertificateModal() {
         document.getElementById('detailDate').textContent = certificate.date;
         document.getElementById('detailDuration').textContent = certificate.duration;
         document.getElementById('certificateId').textContent = certificate.certificateId;
-
-        // Add achievement badge if it exists
-        addAchievementBadge(certificate.achievement);
-
-        // Add seal if it exists
-        addCertificateSeal(certificate.seal);
 
         // Update modal actions to include verify button
         updateModalActions(certificate);
@@ -577,7 +351,8 @@ function initCertificateModal() {
         const downloadBtn = document.querySelector('.download-btn');
         if (downloadBtn) {
             downloadBtn.onclick = function () {
-                simulateDownload(certificate);
+                // Simple download simulation
+                showNotification(`${certificate.title} download started!`, 'info');
             };
         }
     }
@@ -590,84 +365,9 @@ function initCertificateModal() {
         }
     }
 
-    // Function to show certificate modal
-    function showCertificateModal() {
-        certificateModal.classList.add('active');
-        document.body.style.overflow = 'hidden';
-
-        const certificateFrame = document.querySelector('.certificate-frame');
-        certificateFrame.style.animation = 'certificateGlow 3s ease-in-out infinite, certificateFloat 6s ease-in-out infinite';
-
-        setTimeout(() => {
-            certificateFrame.classList.add('animated');
-        }, 100);
-    }
-
-    function addAchievementBadge(achievement) {
-        const existingBadge = document.querySelector('.certificate-achievement');
-        if (existingBadge) existingBadge.remove();
-
-        if (achievement) {
-            const achievementBadge = document.createElement('div');
-            achievementBadge.className = 'certificate-achievement';
-            achievementBadge.textContent = achievement;
-            achievementBadge.style.animation = 'achievementPulse 2s ease-in-out infinite';
-
-            const certificateFrame = document.querySelector('.certificate-frame');
-            certificateFrame.appendChild(achievementBadge);
-        }
-    }
-
-    function addCertificateSeal(seal) {
-        const existingSeal = document.querySelector('.certificate-seal');
-        if (existingSeal) existingSeal.remove();
-
-        if (seal) {
-            const certificateSeal = document.createElement('div');
-            certificateSeal.className = 'certificate-seal';
-            certificateSeal.textContent = seal;
-            certificateSeal.style.animation = 'sealRotate 10s linear infinite';
-
-            const certificateFrame = document.querySelector('.certificate-frame');
-            certificateFrame.appendChild(certificateSeal);
-        }
-    }
-
-    function simulateDownload(certificate) {
-        const downloadBtn = document.querySelector('.download-btn');
-        const originalText = downloadBtn.innerHTML;
-        downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Downloading...';
-        downloadBtn.disabled = true;
-
-        setTimeout(() => {
-            downloadBtn.innerHTML = '<i class="fas fa-check"></i> Downloaded!';
-            downloadBtn.classList.add('success');
-            downloadBtn.disabled = false;
-
-            setTimeout(() => {
-                downloadBtn.innerHTML = originalText;
-                downloadBtn.classList.remove('success');
-                showDownloadCompleteMessage(certificate);
-            }, 2000);
-        }, 2000);
-    }
-
-    function showDownloadCompleteMessage(certificate) {
-        showNotification(`${certificate.title} downloaded successfully!`, 'success');
-    }
-
     function closeModal() {
         certificateModal.classList.remove('active');
         document.body.style.overflow = '';
-
-        const certificateFrame = document.querySelector('.certificate-frame');
-        certificateFrame.style.animation = '';
-
-        const achievementBadge = document.querySelector('.certificate-achievement');
-        const certificateSeal = document.querySelector('.certificate-seal');
-        if (achievementBadge) achievementBadge.remove();
-        if (certificateSeal) certificateSeal.remove();
-
         currentCertificate = null;
     }
 
@@ -720,52 +420,6 @@ function initScrollEffects() {
         } else {
             socialIcons.style.display = 'none';
         }
-
-        // Active navigation highlighting
-        updateActiveNavLink();
-
-        // Scroll animations for elements
-        animateOnScroll();
-    }
-
-    // Update active navigation link based on scroll position
-    function updateActiveNavLink() {
-        const sections = document.querySelectorAll('section');
-        const navLinks = document.querySelectorAll('.nav-link');
-
-        let currentSection = '';
-        const scrollPosition = window.scrollY + 100;
-
-        sections.forEach(section => {
-            const sectionTop = section.offsetTop;
-            const sectionHeight = section.clientHeight;
-
-            if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
-                currentSection = section.getAttribute('id');
-            }
-        });
-
-        navLinks.forEach(link => {
-            link.classList.remove('active');
-            if (link.getAttribute('href') === `#${currentSection}`) {
-                link.classList.add('active');
-            }
-        });
-    }
-
-    // Animate elements on scroll
-    function animateOnScroll() {
-        const animatedElements = document.querySelectorAll('.skill-card, .project-card, .achievement-card, .certificate-card');
-
-        animatedElements.forEach(element => {
-            const elementTop = element.getBoundingClientRect().top;
-            const elementVisible = 150;
-
-            if (elementTop < window.innerHeight - elementVisible) {
-                element.style.opacity = '1';
-                element.style.transform = 'translateY(0)';
-            }
-        });
     }
 
     // Throttle scroll events for better performance
@@ -794,13 +448,9 @@ function initSkillAnimations() {
                     const width = progressBar.style.width;
                     progressBar.style.width = '0%';
 
-                    // Add animation delay based on element position
-                    const delay = Array.from(skillCards).indexOf(entry.target) * 100;
-
                     setTimeout(() => {
                         progressBar.style.width = width;
-                        progressBar.style.transition = 'width 1.5s cubic-bezier(0.4, 0, 0.2, 1)';
-                    }, delay);
+                    }, 300);
 
                     observer.unobserve(entry.target);
                 }
@@ -842,7 +492,7 @@ function initSmoothScroll() {
     });
 }
 
-// ========== NOTIFICATION SYSTEM ==========
+// ========== SIMPLE NOTIFICATION SYSTEM ==========
 function initNotificationSystem() {
     window.showNotification = function (message, type = 'info') {
         const notification = document.createElement('div');
@@ -858,9 +508,6 @@ function initNotificationSystem() {
         notification.innerHTML = `
             <i class="${icons[type] || icons.info}"></i>
             <span>${message}</span>
-            <button class="notification-close">
-                <i class="fas fa-times"></i>
-            </button>
         `;
 
         // Add styles if not already added
@@ -883,8 +530,7 @@ function initNotificationSystem() {
                     align-items: center;
                     gap: 0.75rem;
                     max-width: 400px;
-                    animation: slideInRight 0.5s ease, slideOutRight 0.5s ease 4s forwards;
-                    backdrop-filter: blur(10px);
+                    animation: slideInRight 0.5s ease, slideOutRight 0.5s ease 3s forwards;
                 }
                 
                 .notification-success {
@@ -901,22 +547,6 @@ function initNotificationSystem() {
                 
                 .notification-info {
                     border-left: 4px solid var(--info-color);
-                }
-                
-                .notification-close {
-                    background: transparent;
-                    border: none;
-                    color: var(--text-secondary);
-                    cursor: pointer;
-                    padding: 0.25rem;
-                    border-radius: 4px;
-                    transition: var(--transition);
-                    margin-left: auto;
-                }
-                
-                .notification-close:hover {
-                    background: var(--bg-tertiary);
-                    color: var(--text-primary);
                 }
                 
                 @keyframes slideInRight {
@@ -946,180 +576,17 @@ function initNotificationSystem() {
 
         document.body.appendChild(notification);
 
-        // Add close functionality
-        const closeBtn = notification.querySelector('.notification-close');
-        closeBtn.addEventListener('click', () => {
-            notification.style.animation = 'slideOutRight 0.5s ease forwards';
-            setTimeout(() => {
-                notification.remove();
-            }, 500);
-        });
-
-        // Auto remove after 5 seconds
+        // Auto remove after 3 seconds
         setTimeout(() => {
             if (notification.parentElement) {
-                notification.style.animation = 'slideOutRight 0.5s ease forwards';
-                setTimeout(() => {
-                    if (notification.parentElement) {
-                        notification.remove();
-                    }
-                }, 500);
+                notification.remove();
             }
-        }, 5000);
-
-        return notification;
+        }, 3000);
     };
-}
-
-// ========== PROJECT CARD INTERACTIONS ==========
-function initProjectInteractions() {
-    const projectCards = document.querySelectorAll('.project-card');
-
-    projectCards.forEach(card => {
-        card.addEventListener('mouseenter', function () {
-            this.style.transform = 'translateY(-10px) scale(1.02)';
-            this.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
-        });
-
-        card.addEventListener('mouseleave', function () {
-            this.style.transform = 'translateY(0) scale(1)';
-        });
-
-        // Add click animation
-        card.addEventListener('click', function (e) {
-            if (e.target.closest('.project-link')) return;
-
-            this.style.transform = 'scale(0.98)';
-            setTimeout(() => {
-                this.style.transform = 'translateY(-10px) scale(1.02)';
-            }, 150);
-        });
-    });
-}
-
-// ========== LOADING ANIMATIONS ==========
-function initLoadingAnimations() {
-    // Add loading animation to page elements
-    const animatedElements = document.querySelectorAll('.skill-card, .project-card, .achievement-card, .certificate-card');
-    animatedElements.forEach((element, index) => {
-        element.style.animationDelay = `${index * 0.1}s`;
-        element.style.opacity = '0';
-        element.style.transform = 'translateY(30px)';
-        element.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-    });
-
-    // Trigger animations when elements come into view
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.style.opacity = '1';
-                entry.target.style.transform = 'translateY(0)';
-                observer.unobserve(entry.target);
-            }
-        });
-    }, { threshold: 0.1 });
-
-    animatedElements.forEach(element => {
-        observer.observe(element);
-    });
-}
-
-// ========== PERFORMANCE OPTIMIZATIONS ==========
-function initPerformanceOptimizations() {
-    // Debounce function for resize events
-    function debounce(func, wait) {
-        let timeout;
-        return function executedFunction(...args) {
-            const later = () => {
-                clearTimeout(timeout);
-                func(...args);
-            };
-            clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
-        };
-    }
-
-    // Throttle function for scroll events
-    function throttle(func, limit) {
-        let inThrottle;
-        return function () {
-            const args = arguments;
-            const context = this;
-            if (!inThrottle) {
-                func.apply(context, args);
-                inThrottle = true;
-                setTimeout(() => inThrottle = false, limit);
-            }
-        };
-    }
-
-    // Handle window resize
-    window.addEventListener('resize', debounce(function () {
-        // Update any layout-dependent functionality
-        initScrollEffects();
-    }, 250));
-
-    // Optimize scroll events
-    window.addEventListener('scroll', throttle(function () {
-        // Scroll-based animations are handled in initScrollEffects
-    }, 100));
-}
-
-// ========== ACCESSIBILITY IMPROVEMENTS ==========
-function initAccessibility() {
-    // Add keyboard navigation for interactive elements
-    document.addEventListener('keydown', function (e) {
-        // Close modals with Escape key
-        if (e.key === 'Escape') {
-            const openModal = document.querySelector('.certificate-modal.active');
-            if (openModal) {
-                openModal.classList.remove('active');
-                document.body.style.overflow = '';
-            }
-
-            const openNav = document.querySelector('.nav-menu.active');
-            if (openNav) {
-                openNav.classList.remove('active');
-                document.body.style.overflow = '';
-            }
-        }
-
-        // Tab key navigation for focus management
-        if (e.key === 'Tab') {
-            const focusableElements = document.querySelectorAll(
-                'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-            );
-            const firstElement = focusableElements[0];
-            const lastElement = focusableElements[focusableElements.length - 1];
-
-            if (e.shiftKey && document.activeElement === firstElement) {
-                e.preventDefault();
-                lastElement.focus();
-            } else if (!e.shiftKey && document.activeElement === lastElement) {
-                e.preventDefault();
-                firstElement.focus();
-            }
-        }
-    });
-
-    // Add focus styles for keyboard navigation
-    const interactiveElements = document.querySelectorAll('button, a, input, textarea');
-    interactiveElements.forEach(element => {
-        element.addEventListener('focus', function () {
-            this.style.outline = '2px solid var(--primary-color)';
-            this.style.outlineOffset = '2px';
-        });
-
-        element.addEventListener('blur', function () {
-            this.style.outline = 'none';
-        });
-    });
 }
 
 // ========== INITIALIZE ALL FUNCTIONALITY ==========
 document.addEventListener('DOMContentLoaded', function () {
-    console.log('🚀 Initializing portfolio website...');
-
     // Initialize all modules
     initTheme();
     initMobileMenu();
@@ -1129,47 +596,4 @@ document.addEventListener('DOMContentLoaded', function () {
     initSkillAnimations();
     initSmoothScroll();
     initNotificationSystem();
-    initProjectInteractions();
-    initLoadingAnimations();
-    initPerformanceOptimizations();
-    initAccessibility();
-
-    console.log('✅ Portfolio website initialized successfully!');
-
-    // Check for verification return
-    setTimeout(() => {
-        const pendingVerification = localStorage.getItem('pendingVerification');
-        if (pendingVerification) {
-            const verificationData = JSON.parse(pendingVerification);
-            showNotification(
-                `Welcome back! Did you complete verification for ${verificationData.certificateName}?`,
-                'info'
-            );
-        }
-    }, 2000);
-});
-
-// ========== ERROR HANDLING ==========
-window.addEventListener('error', function (e) {
-    console.error('❌ JavaScript Error:', e.error);
-});
-
-// ========== PAGE VISIBILITY API ==========
-document.addEventListener('visibilitychange', function () {
-    if (document.hidden) {
-        // Page is hidden - pause animations if needed
-        console.log('Page hidden');
-    } else {
-        // Page is visible - resume animations
-        console.log('Page visible');
-    }
-});
-
-// ========== OFFLINE DETECTION ==========
-window.addEventListener('online', function () {
-    showNotification('Connection restored!', 'success');
-});
-
-window.addEventListener('offline', function () {
-    showNotification('You are currently offline. Some features may not work.', 'warning');
 });
